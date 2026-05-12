@@ -71,9 +71,6 @@ int main(void)
         //----------------------------------------------------------------------------------
         // TODO: Update your variables here
         //-------------------------------------------------------------------------- w--------
-
-        // Draw
-        //----------------------------------------------------------------------------------
         
         // Mouse collision in text_box
         if (CheckCollisionPointRec(GetMousePosition(), text_box)){
@@ -164,7 +161,8 @@ int main(void)
                 text_delimiter[letterCount] = '\0';
             }
 
-            // TODO: handle when float
+            // TODO: handle when float,
+            //       LOG current function after each modification.
             if(IsKeyPressed(KEY_ENTER)) {
                 i16 new_value = 0;
                 new_value = atoi(text_delimiter);
