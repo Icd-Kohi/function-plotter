@@ -1,4 +1,12 @@
-//#include "../../Core/Source/Core/Core.h"
+/**********************************************************************
+ * @            App.cpp
+ * @            Self contained function visualizer app
+ *
+ * @            1.0.0
+ *
+ * @            Unlicense license
+ **********************************************************************/
+
 #include <cstdint>
 #include <sys/types.h>
 #include <raylib.h>
@@ -17,17 +25,20 @@ typedef int32_t i32;
 
 float polynomialWave(float x, float a, float b, float c, float d, float e, float f, float g);
 
-// TODO: Modularize code,
-//       Test suite,
-//       More features,
-//       Better README.
-int main(void)
-{
+/*
+ * TODO: Modularize code,
+ *       Test suite,
+ *       More features,
+ *       Better README.
+ */
+
+int main(void){
     // TODO: Better variable namings
     const char* names[] = { "a", "b", "c", "d", "e", "f", "g" };
 
     char status[64];
 
+    //--------------------------------------------------------------------------------------
     // Initialization
     //--------------------------------------------------------------------------------------
     const u16 screenWidth = 1600;
@@ -37,9 +48,9 @@ int main(void)
 
     SetTargetFPS(60);               
     //--------------------------------------------------------------------------------------
+    
     const u16 wave = 400;
     float xRange = 4.0f; // from, to range
-                         //
     
     const float zoomSpeed = 1.1f;
 
@@ -50,34 +61,33 @@ int main(void)
 
     char equationText[128] = { 0 };
     char buttonText[128] = { 0 };
-
-    // ------- VALUE UPDATER ---------
-    // Turn data updater visible/invisible
+    
     bool space_pressed = false; 
     bool show_text = false;
     char text_delimiter[MAX_INPUT + 1] = "\0";
     u8 letterCount = 0;
+
     // textBox
-    Rectangle text_box =  { screenWidth / 2.0f - 550, 180, 250, 50};
+    Rectangle text_box =  { screenWidth / 2.0f - 550, 180, 250, 50 };
     bool mouse_on_text = false;
     u8 frames_counter = 0;
+
     // ------ Update text --------
     char text[64] = { 0 };
     
     // TODO: Refactor updates and drawings
     while (!WindowShouldClose())   
     {
+        //----------------------------------------------------------------------------------
         // Update
         //----------------------------------------------------------------------------------
-        // TODO: Update your variables here
-        //-------------------------------------------------------------------------- w--------
         
         // Mouse collision in text_box
         if (CheckCollisionPointRec(GetMousePosition(), text_box)){
             mouse_on_text = true;
         } else mouse_on_text = false;
 
-        // change function zoom
+        // Function zoom
         if(IsKeyPressed(KEY_UP)){
             xRange /= zoomSpeed;
         }
@@ -85,7 +95,7 @@ int main(void)
             xRange *= zoomSpeed;
         }
 
-        // constraint
+        // Zoom constraint
         if(xRange < 1.0f) xRange = 0.1f;
         if(xRange > 50.0f) xRange = 50.0f;
 
@@ -97,7 +107,8 @@ int main(void)
         if(IsKeyPressed(KEY_LEFT)) dynamic_coefficient = (dynamic_coefficient + 6) % 7;
 
         u16 kp_add = 0;
-        // Numerical keypad +
+
+        // Numerical keypad + ADD {DEFAULT VALUE} to the current selected coefficient
         if (IsKeyPressed(KEY_KP_ADD)){
             kp_add++;
             if(kp_add >= 6) kp_add = 6;
@@ -110,7 +121,7 @@ int main(void)
             else if(dynamic_coefficient == 6) g += adjustmentSpeed;
         }
 
-        // Numerical keypad -
+        // Numerical keypad - SUBTRACT {DEFAULT VALUE} from the current selected coefficient
         if (IsKeyPressed(KEY_KP_SUBTRACT)){
             kp_add--;
             if(kp_add <= 0) kp_add = 0;
@@ -123,9 +134,8 @@ int main(void)
             else if(dynamic_coefficient == 6) g -= adjustmentSpeed;
         }
 
-        // Reset
+        // Reset to {DEFAULT VALUE} by pressing [R] key
         if(IsKeyPressed(KEY_R)){
-            // DEFAULT VALUES
             a = 0.0;
             b = 0.0;
             c = 0.0;
@@ -136,13 +146,13 @@ int main(void)
             xRange = 4.0f; 
         }
 
-        // if space pressed, invokes the text_box
+        // Invokes the text_box by pressing [SPACE] key
         if(IsKeyPressed(KEY_SPACE)) {
             space_pressed = true;
             show_text = true;
         }
 
-        // Update number_key data.
+        // Update `number_key` when hovering `text_box`.
         if(mouse_on_text) {
             i8 number_key = GetCharPressed();
 
@@ -159,9 +169,9 @@ int main(void)
                 letterCount--;
                 if(letterCount < 0) letterCount = 0;
                 text_delimiter[letterCount] = '\0';
-            }
+            } 
 
-            // TODO: handle when float,
+            // TODO: Handle user float inputs,
             //       LOG current function after each modification.
             if(IsKeyPressed(KEY_ENTER)) {
                 i16 new_value = 0;
@@ -181,17 +191,19 @@ int main(void)
         } else {
             SetMouseCursor(MOUSE_CURSOR_DEFAULT);
         }
-        // cursor blinking
+
+        // Cursor blinking
         if (mouse_on_text) {
             frames_counter++;
         } else frames_counter = 0;
-
+        
+        // Write text to given arrays
         snprintf(equationText, sizeof(equationText), "y = %.2fx^6 + %.2fx^5 + %.2fx^4 + %.2fx^3 + %.2fx^2 + %.2fx + %.2f", a, b, c, d, e, f, g);
         snprintf(buttonText, sizeof(buttonText), "UP or DOWN Key: Zoom\nLEFT or RIGHT Key: change Coefficient");
 
-        // -------------- 
+        //--------------------------------------------------------------------------------------
         // Draw
-        // -------------- 
+        //--------------------------------------------------------------------------------------
         BeginDrawing();
 
         ClearBackground(BLACK);
@@ -232,7 +244,7 @@ int main(void)
         DrawText("Y", screenWidth / 2 + 5, 5, 20, GRAY);
         DrawText("X", screenWidth - 20, screenHeight /2  + 5, 20, GRAY);
 
-        // TODO: show axis number_key, following xRange 
+        // TODO: show axis values, `xRange` tied.
 
         for(size_t i = 0; i < wave - 1; ++i){
             float x1 = -xRange + i * step;
@@ -261,7 +273,6 @@ int main(void)
 
         EndDrawing();
     }
-        //----------------------------------------------------------------------------------
 
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
